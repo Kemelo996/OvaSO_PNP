@@ -78,7 +78,7 @@ static void generar_diagrama_gantt(cJSON *array_diagrama, int tiempo_completo, P
  * Method:    algoritmo_Prioridades
  * Signature: (Ljava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_libproceso_JavaProceso_algoritmo_1Prioridades
+JNIEXPORT jstring JNICALL Java_libproceso_JavaProceso_algoritmo_Prioridades
   (JNIEnv *env, jobject obj, jstring json) {
     
     const char *json_input = (*env)->GetStringUTFChars(env, json, 0);
