@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <jni.h>
 #include <cjson/cJSON.h>
-#include "libProceso_JavaProceso.h"
+#include "libproceso_JavaProceso.h"
 #include <stdlib.h>
 
 typedef struct {
@@ -23,7 +23,7 @@ static int planificar_por_prioridad(Proceso *procesos, int cantidad) {
     while (terminados < cantidad) {
         int idx = -1;
         int mayor_prioridad = 9999; // Asumimos prioridades positivas
-        
+
         // Buscar el proceso de mayor prioridad (menor valor) que haya llegado
         for (int i = 0; i < cantidad; i++) {
             if (procesos[i].tiempo_llegada <= reloj && procesos[i].finish == 0) {
@@ -33,7 +33,7 @@ static int planificar_por_prioridad(Proceso *procesos, int cantidad) {
                 }
             }
         }
-        
+
         if (idx != -1) {
             // Ejecutar el proceso completo (no expulsivo)
             procesos[idx].tiempo_inicio = reloj;
@@ -73,15 +73,15 @@ static void generar_diagrama_gantt(cJSON *array_diagrama, int tiempo_completo, P
     }
 }
 
+
 /*
- * Class:     libProceso_JavaProceso
+ * Class:     libproceso_JavaProceso
  * Method:    algoritmo_Prioridades
  * Signature: (Ljava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_libproceso_JavaProceso_algoritmo_Prioridades
+JNIEXPORT jstring JNICALL Java_libproceso_JavaProceso_algoritmo_1Prioridades
   (JNIEnv *env, jobject obj, jstring json) {
-    
-    const char *json_input = (*env)->GetStringUTFChars(env, json, 0);
+const char *json_input = (*env)->GetStringUTFChars(env, json, 0);
     cJSON *entrada = cJSON_Parse(json_input);
     cJSON *objeto_final = cJSON_CreateObject();
     cJSON *sistema_espera = cJSON_CreateObject();
@@ -93,13 +93,13 @@ JNIEXPORT jstring JNICALL Java_libproceso_JavaProceso_algoritmo_Prioridades
         cJSON_AddItemToObject(objeto_final, "Sin resultados", sistema_espera);
         char *resultado = cJSON_Print(objeto_final);
         jstring salida = (*env)->NewStringUTF(env, resultado);
-        
+
         // Liberar recursos
         free(resultado);
         cJSON_Delete(entrada);
         cJSON_Delete(objeto_final);
         (*env)->ReleaseStringUTFChars(env, json, json_input);
-        
+
         return salida;
     }
 
@@ -114,7 +114,7 @@ JNIEXPORT jstring JNICALL Java_libproceso_JavaProceso_algoritmo_Prioridades
         cJSON *llegada = cJSON_GetObjectItem(proceso_iterador, "llegada");
         cJSON *rafaga = cJSON_GetObjectItem(proceso_iterador, "rafaga");
         cJSON *prioridad = cJSON_GetObjectItem(proceso_iterador, "prioridad");
-        
+
         procesos[i].id_proceso = id->valueint;
         procesos[i].tiempo_rafaga = rafaga->valueint;
         procesos[i].prioridad = prioridad->valueint;
@@ -125,7 +125,7 @@ JNIEXPORT jstring JNICALL Java_libproceso_JavaProceso_algoritmo_Prioridades
 
     // Ejecutar el algoritmo de planificación
     int reloj = planificar_por_prioridad(procesos, size);
-    
+
     // Generar el diagrama de Gantt
     cJSON *array_diagrama = cJSON_CreateArray();
     generar_diagrama_gantt(array_diagrama, reloj, procesos, size);
@@ -147,13 +147,12 @@ JNIEXPORT jstring JNICALL Java_libproceso_JavaProceso_algoritmo_Prioridades
     // Convertir a cadena JSON
     char *resultado = cJSON_Print(objeto_final);
     jstring salida = (*env)->NewStringUTF(env, resultado);
-    
+
     // Liberar memoria
     cJSON_Delete(entrada);
     cJSON_Delete(objeto_final);
     free(procesos);
     free(resultado);
     (*env)->ReleaseStringUTFChars(env, json, json_input);
-    
     return salida;
 }
